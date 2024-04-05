@@ -1,0 +1,46 @@
+document.getElementById('search-form').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent form submission
+  
+    const city = document.getElementById('city-input').value;
+  
+    fetchWeather(city);
+  });
+  
+  function fetchWeather(city) {
+    const apiKey = 'YOUR_API_KEY'; // Replace with your API key from weatherapi.com
+    const apiUrl = `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${city}&days=5`;
+  
+    fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => {
+        displayWeather(data);
+      })
+      .catch(error => {
+        console.error('Error fetching weather data:', error);
+      });
+  }
+  
+  function displayWeather(data) {
+    const current = data.current;
+    const forecast = data.forecast.forecastday;
+  
+    const weatherInfo = document.getElementById('weather-info');
+    weatherInfo.innerHTML = `
+      <h2>${data.location.name}, ${data.location.country}</h2>
+      <p>Current Time: ${current.last_updated}</p>
+      <p>Current Temperature: ${current.temp_c}°C</p>
+      <p>Weather Condition: ${current.condition.text}</p>
+      <p>Humidity: ${current.humidity}%</p>
+      <h3>5-Day Forecast:</h3>
+      <div class="forecast">
+        ${forecast.map(day => `
+          <div>
+            <p>Date: ${day.date}</p>
+            <p>Max Temperature: ${day.day.maxtemp_c}°C</p>
+            <p>Min Temperature: ${day.day.mintemp_c}°C</p>
+            <p>Condition: ${day.day.condition.text}</p>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
